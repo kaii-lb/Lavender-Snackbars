@@ -11,7 +11,7 @@ interface LavenderSnackbarEvent {
     val id: Int
 }
 
-internal interface LavenderSnackbarData {
+interface LavenderSnackbarData {
     val event: LavenderSnackbarEvent
 
     fun performAction() {}

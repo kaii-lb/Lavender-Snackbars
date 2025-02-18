@@ -20,5 +20,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Lavender Snackbars"
-include(":app")
+// include(":app")
 include(":lavender_snackbars")

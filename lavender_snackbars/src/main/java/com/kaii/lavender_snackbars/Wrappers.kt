@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 
@@ -50,6 +51,7 @@ fun LavenderSnackbarBox(
                 .systemBarsPadding()
                 .fillMaxSize(1f)
                 .padding(12.dp)
+                .zIndex(100f)
         ) {
             // keep last event in memory so the exit animation actually works
             // not proud of this but oh well it works
