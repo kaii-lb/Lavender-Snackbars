@@ -34,6 +34,18 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    publishing {
+    	singleVariant("release") {
+    		withSourcesJar()
+    		withJavadocJar()
+    	}
+
+    	singleVariant("debug") {
+    		withSourcesJar()
+    		withJavadocJar()
+    	}
+    }
 }
 
 dependencies {
@@ -50,4 +62,23 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+}
+
+val androidSourceJar by tasks.registering(Jar::class) {
+	archiveClassifier.set("sources")
+	from(android.sourceSets.getByName("main").java.srcDirs)
+}
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                groupId = "com.kaii.lavender"
+                artifactId = "lavender_snackbars"
+                version = "0.1.1"
+
+				from(components["release"])
+                artifact(androidSourceJar.get())
+            }
+        }
+    }
 }

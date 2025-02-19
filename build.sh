@@ -19,7 +19,3 @@ elif [ "$1" == "universal" ];then
     tag=universal
 fi
 JAVA_HOME=/opt/android-studio/jbr/ ./gradlew $gradleTarget ${@:2}
-
-echo "Signing...."
-./apksigner/apksigner sign --in ./app/build/outputs/$target/${file}.apk --out snackbars_signed_$tag.apk --key keys/releasekey.pk8 --cert keys/releasekey.x509.pem
-echo "Signed!"
