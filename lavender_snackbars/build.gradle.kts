@@ -68,17 +68,17 @@ val androidSourceJar by tasks.registering(Jar::class) {
 	archiveClassifier.set("sources")
 	from(android.sourceSets.getByName("main").java.srcDirs)
 }
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("release") {
-                groupId = "com.kaii.lavender"
-                artifactId = "lavender_snackbars"
-                version = "0.1.1"
 
+publishing {
+	publications {
+		create<MavenPublication>("release") {
+			groupId = "com.kaii.lavender"
+			artifactId = "lavender_snackbars"
+			version = "0.1.1"
+
+			afterEvaluate {
 				from(components["release"])
-                artifact(androidSourceJar.get())
-            }
-        }
-    }
+			}
+		}
+	}
 }
