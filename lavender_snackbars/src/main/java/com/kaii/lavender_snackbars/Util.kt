@@ -12,6 +12,7 @@ object LavenderSnackbarController {
     val events = _events.receiveAsFlow()
 
     /** queue a snackbar event to be displayed */
+    @Suppress("unused")
     suspend fun pushEvent(event: LavenderSnackbarEvent) {
         _events.send(event)
     }
@@ -26,7 +27,13 @@ fun SnackbarDuration.toMillis() = when (this) {
 }
 
 internal enum class DragAnchors {
-    Start,
-    Center,
-    End
+    Top,
+    Bottom,
+    DismissingTop,
+    DismissingBottom
 }
+
+internal fun DragAnchors.getLastPosition() =
+	if (this == DragAnchors.DismissingTop) DragAnchors.Top
+	else if (this == DragAnchors.DismissingBottom) DragAnchors.Bottom
+	else this

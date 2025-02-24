@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CancellableContinuation
@@ -90,22 +89,18 @@ class LavenderSnackbarHostState {
  * there is a 300ms delay between each event */
 @Composable
 fun LavenderSnackbarHost(snackbarHostState: LavenderSnackbarHostState) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-
     val inChannel by LavenderSnackbarController.events.collectAsStateWithLifecycle(initialValue = null)
 
     // LaunchedEffect cancels whenever the keys change, meaning the suspendCancellableCoroutine is also canceled
     // this way we don't have to deal with stupid dismissal rules to make sure latest snackbar is always shown
     // even though this might by hacky
     // note: look into DisposableEffect maybe its onDispose method can help cleanup the suspendCancellableCoroutine with a dismiss()
-    LaunchedEffect(inChannel, lifecycleOwner.lifecycle, snackbarHostState) {
+    LaunchedEffect(inChannel, snackbarHostState) {
         if (inChannel == null) return@LaunchedEffect
 
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            snackbarHostState.currentSnackbarEvent?.dismiss()
-            delay(300)
-            snackbarHostState.showSnackbar(inChannel!!)
-        }
+        snackbarHostState.currentSnackbarEvent?.dismiss()
+        delay(300)
+        snackbarHostState.showSnackbar(inChannel!!)
     }
 
     val currentEvent = snackbarHostState.currentSnackbarEvent

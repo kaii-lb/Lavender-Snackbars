@@ -2,28 +2,25 @@ package com.kaii.lavender_snackbars
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.AnchoredDraggableState
-import androidx.compose.foundation.gestures.DraggableAnchors
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -41,62 +38,102 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
+object LavenderSnackbarDefaults {
+    val containerColor: Color
+        @Composable
+        get() = MaterialTheme.colorScheme.primary
+
+    val contentColor: Color
+        @Composable
+        get() = MaterialTheme.colorScheme.onPrimary
+
+	val bottomEnterTransition = slideInVertically { height -> height } + expandHorizontally { width -> (width * 0.2f).toInt() }
+	val bottomExitTransition = slideOutVertically { height -> height } + shrinkHorizontally { width -> (width * 0.2f).toInt() }
+
+	val topEnterTransition = slideInVertically { height -> -height } + expandHorizontally { width -> (width * 0.2f).toInt() }
+	val topExitTransition = slideOutVertically { height -> -height } + shrinkHorizontally { width -> (width * 0.2f).toInt() }
+
+    @Composable
+    fun GetSnackbarType(snackbarHostState: LavenderSnackbarHostState) {
+        // keep last event in memory so the exit animation actually works
+        // not proud of this but oh well it works
+        var lastEvent by remember { mutableStateOf(snackbarHostState.currentSnackbarEvent!!) }
+        val currentEvent = remember(snackbarHostState.currentSnackbarEvent) {
+            if (snackbarHostState.currentSnackbarEvent == null) {
+                lastEvent
+            } else {
+                lastEvent = snackbarHostState.currentSnackbarEvent!!
+                lastEvent
+            }
+        }
+
+        when (currentEvent.event) {
+            is LavenderSnackbarEvents.LoadingEvent -> {
+                val event = currentEvent.event as LavenderSnackbarEvents.LoadingEvent
+
+                SnackbarWithLoadingIndicator(
+                    message = event.message,
+                    iconResId = event.iconResId,
+                    isLoading = event.isLoading.value
+                ) {
+                    snackbarHostState.currentSnackbarEvent?.dismiss()
+                }
+            }
+
+            is LavenderSnackbarEvents.MessageEvent -> {
+                val event = currentEvent.event as LavenderSnackbarEvents.MessageEvent
+
+                SnackBarWithMessage(
+                    message = event.message,
+                    iconResId = event.iconResId
+                ) {
+                    snackbarHostState.currentSnackbarEvent?.dismiss()
+                }
+            }
+
+            is LavenderSnackbarEvents.ActionEvent -> {
+                val event = currentEvent.event as LavenderSnackbarEvents.ActionEvent
+
+                SnackBarWithAction(
+                    message = event.message,
+                    iconResId = event.iconResId,
+                    actionIconResId = event.actionIconResId,
+                    action = event.action
+                )
+            }
+
+            else -> {
+                Text(
+                    text = "THIS SHOULD NOT BE VISIBLE",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.primary)
+                        .padding(8.dp)
+                        .clip(CircleShape)
+                )
+            }
+        }
+    }
+}
+
 /** Base snackbar with an icon and a message */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun BoxScope.LavenderSnackbar(
+private fun LavenderSnackbar(
     message: String,
     @DrawableRes iconResId: Int,
-    containerColor: Color = MaterialTheme.colorScheme.primary,
-    contentColor: Color = MaterialTheme.colorScheme.onPrimary,
+    containerColor: Color = LavenderSnackbarDefaults.containerColor,
+    contentColor: Color = LavenderSnackbarDefaults.contentColor,
     content: @Composable RowScope.() -> Unit
 ) {
-    val localDensity = LocalDensity.current
-    val anchors = DraggableAnchors {
-        with (localDensity) {
-            DragAnchors.Start at -100.dp.toPx()
-            DragAnchors.Center at 0.dp.toPx()
-            DragAnchors.End at 100.dp.toPx()
-        }
-    }
-
-    val decayAnimationSpec = rememberSplineBasedDecay<Float>()
-    val anchoredDraggableState = remember {
-        AnchoredDraggableState(
-            initialValue = DragAnchors.Start,
-            anchors = anchors,
-            positionalThreshold = { total: Float ->
-                total * 0.7f
-            },
-            velocityThreshold = {
-                with (localDensity) { 100.dp.toPx() }
-            },
-            snapAnimationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessMedium
-            ),
-            decayAnimationSpec = decayAnimationSpec
-        )
-    }
-
-    var snackbarAlignment by remember { mutableStateOf(Alignment.BottomCenter)}
-    LaunchedEffect(anchoredDraggableState.currentValue) {
-        snackbarAlignment = if (anchoredDraggableState.currentValue == DragAnchors.Start) {
-            Alignment.TopCenter
-        } else {
-            Alignment.BottomCenter
-        }
-    }
-
     Surface(
         contentColor = contentColor,
         color = containerColor,
@@ -105,16 +142,11 @@ private fun BoxScope.LavenderSnackbar(
         modifier = Modifier
             .height(64.dp)
             .fillMaxWidth(1f)
-            .align(snackbarAlignment)
-            .anchoredDraggable(
-                state = anchoredDraggableState,
-                orientation = Orientation.Vertical
-            )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(1f)
-                .fillMaxHeight(1f)
+                .height(64.dp)
                 .padding(16.dp, 8.dp, 12.dp, 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
@@ -144,7 +176,7 @@ private fun BoxScope.LavenderSnackbar(
 
 /** A snackbar displaying an icon, a message and its dismiss button*/
 @Composable
-internal fun BoxScope.SnackBarWithMessage(
+internal fun SnackBarWithMessage(
     message: String,
     @DrawableRes iconResId: Int,
     onDismiss: () -> Unit
@@ -170,7 +202,7 @@ internal fun BoxScope.SnackBarWithMessage(
 
 /** A snackbar displaying an icon, a message and an action */
 @Composable
-internal fun BoxScope.SnackBarWithAction(
+internal fun SnackBarWithAction(
     message: String,
     @DrawableRes iconResId: Int,
     @DrawableRes actionIconResId: Int,
@@ -197,7 +229,7 @@ internal fun BoxScope.SnackBarWithAction(
 
 /** A snackbar showing an infinite loading indicator along with a message and an icon */
 @Composable
-internal fun BoxScope.SnackbarWithLoadingIndicator(
+internal fun SnackbarWithLoadingIndicator(
     message: String,
     @DrawableRes iconResId: Int,
     isLoading: Boolean,

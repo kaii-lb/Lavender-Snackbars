@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     id("maven-publish")
 }
 
@@ -17,33 +18,22 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        sourceCompatibility(JavaVersion.VERSION_17)
+        targetCompatibility(JavaVersion.VERSION_17)
     }
     buildFeatures {
         compose = true
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
-
     publishing {
     	singleVariant("release") {
     		withSourcesJar()
-    		withJavadocJar()
-    	}
-
-    	singleVariant("debug") {
-    		withSourcesJar()
-    		withJavadocJar()
     	}
     }
 }
@@ -64,17 +54,12 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 }
 
-val androidSourceJar by tasks.registering(Jar::class) {
-	archiveClassifier.set("sources")
-	from(android.sourceSets.getByName("main").java.srcDirs)
-}
-
 publishing {
 	publications {
 		create<MavenPublication>("release") {
 			groupId = "com.kaii.lavender"
 			artifactId = "lavender_snackbars"
-			version = "0.1.1"
+			version = "0.1.4"
 
 			afterEvaluate {
 				from(components["release"])
