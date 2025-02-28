@@ -23,6 +23,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -63,7 +66,9 @@ fun LavenderSnackbarBox(
             }
         }
 
-        val currentEvent = snackbarHostState.currentSnackbarEvent
+        val currentEvent by remember { derivedStateOf {
+        	snackbarHostState.currentSnackbarEvent
+        }}
         val decayAnimationSpec = remember {
             FloatExponentialDecaySpec(3f).generateDecayAnimationSpec<Float>()
         }
