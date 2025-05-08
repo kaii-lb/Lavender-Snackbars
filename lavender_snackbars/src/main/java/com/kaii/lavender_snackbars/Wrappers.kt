@@ -1,13 +1,13 @@
 package com.kaii.lavender_snackbars
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.Alignment
@@ -37,6 +36,7 @@ import kotlin.math.roundToInt
 
 /** Wrapper for easy displaying of [LavenderSnackbarEvent]s.
  * wrap around the top-most component of your UI, usually a NavHost */
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LavenderSnackbarBox(
@@ -56,44 +56,42 @@ fun LavenderSnackbarBox(
     ) {
         LavenderSnackbarHost(snackbarHostState = snackbarHostState)
 
-        val localDensity = LocalDensity.current
-        val anchors = DraggableAnchors {
-            with(localDensity) {
-                DragAnchors.Top at 0f
-                DragAnchors.Bottom at (maxHeight - 64.dp - 24.dp).toPx()
-                DragAnchors.DismissingBottom at (maxHeight + 64.dp + 75.dp).toPx()
-                DragAnchors.DismissingTop at ((-64).dp - 175.dp).toPx()
-            }
-        }
-
         val currentEvent by remember { derivedStateOf {
-        	snackbarHostState.currentSnackbarEvent
+            snackbarHostState.currentSnackbarEvent
         }}
-        val decayAnimationSpec = remember {
-            FloatExponentialDecaySpec(3f).generateDecayAnimationSpec<Float>()
-        }
+
+        val localDensity = LocalDensity.current
+        val anchors by remember { derivedStateOf {
+            DraggableAnchors {
+                with(localDensity) {
+                    DragAnchors.Top at 0f
+                    DragAnchors.Bottom at (maxHeight - 64.dp - 24.dp).toPx()
+
+                    if (currentEvent?.event !is LavenderSnackbarEvents.LoadingEvent) {
+                        DragAnchors.DismissingBottom at (maxHeight + 64.dp + 75.dp).toPx()
+                        DragAnchors.DismissingTop at ((-64).dp - 175.dp).toPx()
+                    }
+                }
+            }
+        }}
 
         val anchoredDraggableState = remember {
             AnchoredDraggableState(
                 initialValue = DragAnchors.Top,
-                anchors = anchors,
-                positionalThreshold = { total: Float ->
-                    total * 0.8f
-                },
-                velocityThreshold = {
-                    with(localDensity) { 200.dp.toPx() }
-                },
-                snapAnimationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium
-                ),
-                decayAnimationSpec = decayAnimationSpec,
-                confirmValueChange = { state: DragAnchors ->
-                    // do not dismiss if the current event is a loading event
-                    !((state == DragAnchors.DismissingTop || state == DragAnchors.DismissingBottom) && currentEvent?.event is LavenderSnackbarEvents.LoadingEvent)
-                }
+                anchors = anchors
             )
         }
+
+        val anchoredDraggableFlingBehavior = AnchoredDraggableDefaults.flingBehavior(
+            state = anchoredDraggableState,
+            positionalThreshold = { total: Float ->
+                total * 0.8f
+            },
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium
+            )
+        )
 
         LaunchedEffect(currentEvent) {
             if (currentEvent == null) {
@@ -124,7 +122,8 @@ fun LavenderSnackbarBox(
                 }
                 .anchoredDraggable(
                     state = anchoredDraggableState,
-                    orientation = Orientation.Vertical
+                    orientation = Orientation.Vertical,
+                    flingBehavior = anchoredDraggableFlingBehavior
                 )
                 .systemBarsPadding()
                 .fillMaxWidth(1f)
