@@ -61,24 +61,27 @@ fun LavenderSnackbarBox(
         }}
 
         val localDensity = LocalDensity.current
-        val anchors by remember { derivedStateOf {
+        val normalAnchors =
             DraggableAnchors {
                 with(localDensity) {
                     DragAnchors.Top at 0f
                     DragAnchors.Bottom at (maxHeight - 64.dp - 24.dp).toPx()
-
-                    if (currentEvent?.event !is LavenderSnackbarEvents.LoadingEvent) {
-                        DragAnchors.DismissingBottom at (maxHeight + 64.dp + 75.dp).toPx()
-                        DragAnchors.DismissingTop at ((-64).dp - 175.dp).toPx()
-                    }
+                    DragAnchors.DismissingBottom at (maxHeight + 64.dp + 75.dp).toPx()
+                    DragAnchors.DismissingTop at ((-64).dp - 175.dp).toPx()
                 }
             }
-        }}
+        val loadingAnchors =
+            DraggableAnchors {
+                with(localDensity) {
+                    DragAnchors.Top at 0f
+                    DragAnchors.Bottom at (maxHeight - 64.dp - 24.dp).toPx()
+                }
+            }
 
         val anchoredDraggableState = remember {
             AnchoredDraggableState(
                 initialValue = DragAnchors.Top,
-                anchors = anchors
+                anchors = normalAnchors
             )
         }
 
@@ -97,6 +100,16 @@ fun LavenderSnackbarBox(
             if (currentEvent == null) {
                 delay(400)
                 anchoredDraggableState.snapTo(anchoredDraggableState.currentValue.getLastPosition())
+            }
+
+            if (currentEvent?.event !is LavenderSnackbarEvents.LoadingEvent) {
+                anchoredDraggableState.updateAnchors(
+                    loadingAnchors
+                )
+            } else {
+                anchoredDraggableState.updateAnchors(
+                    normalAnchors
+                )
             }
         }
 
