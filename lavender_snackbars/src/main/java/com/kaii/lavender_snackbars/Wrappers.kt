@@ -1,6 +1,5 @@
 package com.kaii.lavender_snackbars
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -20,11 +19,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.overscroll
+import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -36,13 +37,17 @@ import kotlin.math.roundToInt
 
 /** Wrapper for easy displaying of [LavenderSnackbarEvent]s.
  * wrap around the top-most component of your UI, usually a NavHost */
-@SuppressLint("UnusedBoxWithConstraintsScope")
+@Suppress("unused")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LavenderSnackbarBox(
     snackbarHostState: LavenderSnackbarHostState,
     modifier: Modifier = Modifier,
-    snackbarComposable: @Composable () -> Unit = { LavenderSnackbarDefaults.GetSnackbarType(snackbarHostState) },
+    snackbarComposable: @Composable () -> Unit = {
+        LavenderSnackbarDefaults.GetSnackbarType(
+            snackbarHostState
+        )
+    },
     bottomEnterTransition: EnterTransition = LavenderSnackbarDefaults.bottomEnterTransition,
     bottomExitTransition: ExitTransition = LavenderSnackbarDefaults.bottomExitTransition,
     topEnterTransition: EnterTransition = LavenderSnackbarDefaults.topEnterTransition,
@@ -54,27 +59,31 @@ fun LavenderSnackbarBox(
             .fillMaxSize(1f),
         contentAlignment = Alignment.Center
     ) {
+        val boxScope = this
+
         LavenderSnackbarHost(snackbarHostState = snackbarHostState)
 
-        val currentEvent by remember { derivedStateOf {
-            snackbarHostState.currentSnackbarEvent
-        }}
+        val currentEvent by remember {
+            derivedStateOf {
+                snackbarHostState.currentSnackbarEvent
+            }
+        }
 
         val localDensity = LocalDensity.current
         val normalAnchors =
             DraggableAnchors {
                 with(localDensity) {
                     DragAnchors.Top at 0f
-                    DragAnchors.Bottom at (maxHeight - 64.dp - 24.dp).toPx()
-                    DragAnchors.DismissingBottom at (maxHeight + 64.dp + 75.dp).toPx()
-                    DragAnchors.DismissingTop at ((-64).dp - 175.dp).toPx()
+                    DragAnchors.Bottom at (boxScope.maxHeight - 128.dp - 24.dp).toPx()
+                    DragAnchors.DismissingBottom at (boxScope.maxHeight + 64.dp + 75.dp).toPx()
+                    DragAnchors.DismissingTop at ((-128).dp - 175.dp).toPx()
                 }
             }
         val loadingAnchors =
             DraggableAnchors {
                 with(localDensity) {
                     DragAnchors.Top at 0f
-                    DragAnchors.Bottom at (maxHeight - 64.dp - 24.dp).toPx()
+                    DragAnchors.Bottom at (boxScope.maxHeight - 128.dp - 24.dp).toPx()
                 }
             }
 
@@ -92,23 +101,23 @@ fun LavenderSnackbarBox(
             },
             animationSpec = spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessMedium
+                stiffness = Spring.StiffnessMediumLow
             )
         )
 
         LaunchedEffect(currentEvent) {
             if (currentEvent == null) {
-                delay(400)
+                delay(500)
                 anchoredDraggableState.snapTo(anchoredDraggableState.currentValue.getLastPosition())
             }
 
-            if (currentEvent?.event !is LavenderSnackbarEvents.LoadingEvent) {
+            if (currentEvent?.event is LavenderSnackbarEvents.LoadingEvent) {
                 anchoredDraggableState.updateAnchors(
-                    loadingAnchors
+                    newAnchors = loadingAnchors
                 )
             } else {
                 anchoredDraggableState.updateAnchors(
-                    normalAnchors
+                    newAnchors = normalAnchors
                 )
             }
         }
@@ -121,6 +130,7 @@ fun LavenderSnackbarBox(
             }
         }
 
+        val overscrollEffect = rememberOverscrollEffect()
         AnimatedVisibility(
             visible = currentEvent != null,
             enter = if (anchoredDraggableState.currentValue.getLastPosition() == DragAnchors.Top) topEnterTransition else bottomEnterTransition,
@@ -136,7 +146,11 @@ fun LavenderSnackbarBox(
                 .anchoredDraggable(
                     state = anchoredDraggableState,
                     orientation = Orientation.Vertical,
-                    flingBehavior = anchoredDraggableFlingBehavior
+                    flingBehavior = anchoredDraggableFlingBehavior,
+                    overscrollEffect = overscrollEffect
+                )
+                .overscroll(
+                    overscrollEffect
                 )
                 .systemBarsPadding()
                 .fillMaxWidth(1f)
