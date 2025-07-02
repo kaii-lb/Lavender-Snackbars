@@ -6,8 +6,8 @@ plugins {
 }
 
 android {
-    namespace = "com.kaii.lavender_snackbars"
-    compileSdk = 34
+    namespace = "com.kaii.lavender.snackbars"
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 30
@@ -48,6 +48,8 @@ dependencies {
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.animation.android)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.ui.tooling)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -58,8 +60,8 @@ publishing {
 	publications {
 		create<MavenPublication>("release") {
 			groupId = "com.kaii.lavender"
-			artifactId = "lavender_snackbars"
-			version = "0.1.4"
+			artifactId = "snackbars"
+			version = "0.1.5"
 
 			afterEvaluate {
 				from(components["release"])

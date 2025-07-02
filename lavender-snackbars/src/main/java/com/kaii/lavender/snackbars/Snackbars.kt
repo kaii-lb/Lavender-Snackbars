@@ -1,20 +1,21 @@
-package com.kaii.lavender_snackbars
+package com.kaii.lavender.snackbars
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -32,6 +33,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableFloatState
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -56,11 +61,19 @@ object LavenderSnackbarDefaults {
         @Composable
         get() = MaterialTheme.colorScheme.onPrimary
 
-	val bottomEnterTransition = slideInVertically { height -> height } + expandHorizontally { width -> (width * 0.2f).toInt() }
-	val bottomExitTransition = slideOutVertically { height -> height } + shrinkHorizontally { width -> (width * 0.2f).toInt() }
+    val contentColorLight: Color
+        @Composable
+        get() = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.4f)
 
-	val topEnterTransition = slideInVertically { height -> -height } + expandHorizontally { width -> (width * 0.2f).toInt() }
-	val topExitTransition = slideOutVertically { height -> -height } + shrinkHorizontally { width -> (width * 0.2f).toInt() }
+    val bottomEnterTransition =
+        slideInVertically { height -> height } + expandHorizontally { width -> (width * 0.2f).toInt() }
+    val bottomExitTransition =
+        slideOutVertically { height -> height } + shrinkHorizontally { width -> (width * 0.2f).toInt() }
+
+    val topEnterTransition =
+        slideInVertically { height -> -height } + expandHorizontally { width -> (width * 0.2f).toInt() }
+    val topExitTransition =
+        slideOutVertically { height -> -height } + shrinkHorizontally { width -> (width * 0.2f).toInt() }
 
     @Composable
     fun GetSnackbarType(snackbarHostState: LavenderSnackbarHostState) {
@@ -82,7 +95,7 @@ object LavenderSnackbarDefaults {
 
                 SnackbarWithLoadingIndicator(
                     message = event.message,
-                    iconResId = event.iconResId,
+                    icon = event.icon,
                     isLoading = event.isLoading.value
                 ) {
                     snackbarHostState.currentSnackbarEvent?.dismiss()
@@ -94,7 +107,7 @@ object LavenderSnackbarDefaults {
 
                 SnackBarWithMessage(
                     message = event.message,
-                    iconResId = event.iconResId
+                    icon = event.icon
                 ) {
                     snackbarHostState.currentSnackbarEvent?.dismiss()
                 }
@@ -105,10 +118,23 @@ object LavenderSnackbarDefaults {
 
                 SnackBarWithAction(
                     message = event.message,
-                    iconResId = event.iconResId,
-                    actionIconResId = event.actionIconResId,
+                    icon = event.icon,
+                    actionIcon = event.actionIcon,
                     action = event.action
                 )
+            }
+
+            is LavenderSnackbarEvents.ProgressEvent -> {
+                val event = currentEvent.event as LavenderSnackbarEvents.ProgressEvent
+
+                SnackbarWithLoadingIndicatorAndBody(
+                    message = event.message,
+                    body = event.body,
+                    icon = event.icon,
+                    percentage = event.percentage
+                ) {
+                    snackbarHostState.currentSnackbarEvent?.dismiss()
+                }
             }
 
             else -> {
@@ -129,7 +155,7 @@ object LavenderSnackbarDefaults {
 @Composable
 private fun LavenderSnackbar(
     message: String,
-    @DrawableRes iconResId: Int,
+    @DrawableRes icon: Int,
     containerColor: Color = LavenderSnackbarDefaults.containerColor,
     contentColor: Color = LavenderSnackbarDefaults.contentColor,
     content: @Composable RowScope.() -> Unit
@@ -152,7 +178,7 @@ private fun LavenderSnackbar(
             horizontalArrangement = Arrangement.Start
         ) {
             Icon(
-                painter = painterResource(id = iconResId),
+                painter = painterResource(id = icon),
                 contentDescription = "Snackbar icon",
                 modifier = Modifier
                     .size(32.dp)
@@ -178,12 +204,12 @@ private fun LavenderSnackbar(
 @Composable
 internal fun SnackBarWithMessage(
     message: String,
-    @DrawableRes iconResId: Int,
+    @DrawableRes icon: Int,
     onDismiss: () -> Unit
 ) {
     LavenderSnackbar(
         message = message,
-        iconResId = iconResId
+        icon = icon
     ) {
         IconButton(
             onClick = {
@@ -204,13 +230,13 @@ internal fun SnackBarWithMessage(
 @Composable
 internal fun SnackBarWithAction(
     message: String,
-    @DrawableRes iconResId: Int,
-    @DrawableRes actionIconResId: Int,
+    @DrawableRes icon: Int,
+    @DrawableRes actionIcon: Int,
     action: () -> Unit
 ) {
     LavenderSnackbar(
         message = message,
-        iconResId = iconResId
+        icon = icon
     ) {
         IconButton(
             onClick = {
@@ -218,7 +244,7 @@ internal fun SnackBarWithAction(
             }
         ) {
             Icon(
-                painter = painterResource(id = actionIconResId),
+                painter = painterResource(id = actionIcon),
                 contentDescription = "Run this snackbar's action",
                 modifier = Modifier
                     .size(32.dp)
@@ -231,7 +257,7 @@ internal fun SnackBarWithAction(
 @Composable
 internal fun SnackbarWithLoadingIndicator(
     message: String,
-    @DrawableRes iconResId: Int,
+    @DrawableRes icon: Int,
     isLoading: Boolean,
     dismiss: () -> Unit
 ) {
@@ -244,7 +270,7 @@ internal fun SnackbarWithLoadingIndicator(
 
     LavenderSnackbar(
         message = message,
-        iconResId = iconResId
+        icon = icon
     ) {
         AnimatedContent(
             targetState = isLoading,
@@ -284,6 +310,120 @@ internal fun SnackbarWithLoadingIndicator(
                         .size(32.dp)
                         .align(Alignment.CenterVertically)
                 )
+            }
+        }
+    }
+}
+
+/** A snackbar showing an loading indicator along with a message, body and an icon */
+@Composable
+internal fun SnackbarWithLoadingIndicatorAndBody(
+    message: String,
+    body: MutableState<String>,
+    @DrawableRes icon: Int,
+    percentage: MutableFloatState,
+    dismiss: () -> Unit
+) {
+    val isLoading by remember {
+        derivedStateOf {
+            percentage.floatValue < 1f
+        }
+    }
+
+    LaunchedEffect(isLoading) {
+        if (!isLoading) {
+            delay(2000)
+            dismiss()
+        }
+    }
+
+    Surface(
+        contentColor = LavenderSnackbarDefaults.contentColor,
+        color = LavenderSnackbarDefaults.containerColor,
+        shape = CircleShape,
+        shadowElevation = 8.dp,
+        modifier = Modifier
+            .height(64.dp)
+            .fillMaxWidth(1f)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(1f)
+                .height(64.dp)
+                .padding(16.dp, 8.dp, 12.dp, 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = "Snackbar icon",
+                modifier = Modifier
+                    .size(32.dp)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                Text(
+                    text = message,
+                    fontSize = TextUnit(16f, TextUnitType.Sp),
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                Text(
+                    text = body.value,
+                    fontSize = TextUnit(13f, TextUnitType.Sp),
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            AnimatedContent(
+                targetState = isLoading,
+                transitionSpec = {
+                    (scaleIn(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy
+                        )
+                    ) + fadeIn()
+                            ).togetherWith(
+                            scaleOut(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy
+                                )
+                            ) + fadeOut()
+                        )
+                },
+                label = "Animate between loading and loaded states in snackbar",
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(4.dp, 0.dp)
+            ) { loading ->
+                if (loading) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeCap = StrokeCap.Round,
+                        strokeWidth = 4.dp,
+                        progress = { percentage.floatValue },
+                        trackColor = LavenderSnackbarDefaults.contentColorLight,
+                        modifier = Modifier
+                            .size(28.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(id = R.drawable.checkmark),
+                        contentDescription = "Loading done",
+                        modifier = Modifier
+                            .size(32.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+                }
             }
         }
     }

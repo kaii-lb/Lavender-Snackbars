@@ -1,4 +1,4 @@
-package com.kaii.lavender_snackbars
+package com.kaii.lavender.snackbars
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.kaii.lavender_snackbars.test", appContext.packageName)
+        assertEquals("com.kaii.lavender.snackbars.test", appContext.packageName)
     }
 }

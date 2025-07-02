@@ -1,4 +1,4 @@
-package com.kaii.lavender_snackbars
+package com.kaii.lavender.snackbars
 
 import androidx.compose.material3.SnackbarDuration
 import kotlinx.coroutines.channels.Channel

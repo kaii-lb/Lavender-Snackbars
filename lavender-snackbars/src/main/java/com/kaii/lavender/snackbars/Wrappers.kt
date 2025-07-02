@@ -1,4 +1,4 @@
-package com.kaii.lavender_snackbars
+package com.kaii.lavender.snackbars
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition

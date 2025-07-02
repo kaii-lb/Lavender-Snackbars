@@ -1,14 +1,17 @@
-package com.kaii.lavender_snackbars
+package com.kaii.lavender.snackbars
 
 import androidx.annotation.DrawableRes
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
-import kotlin.random.Random
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 interface LavenderSnackbarEvent {
     val message: String
     val duration: SnackbarDuration
-    val id: Int
+    val id: Uuid
 }
 
 interface LavenderSnackbarData {
@@ -18,13 +21,14 @@ interface LavenderSnackbarData {
     fun dismiss() {}
 }
 
+@OptIn(ExperimentalUuidApi::class)
 object LavenderSnackbarEvents {
     /** Shows a [SnackbarWithLoadingIndicator] */
     data class LoadingEvent(
         override val message: String,
-        @DrawableRes val iconResId: Int,
+        @DrawableRes val icon: Int,
         val isLoading: MutableState<Boolean>,
-        override val id: Int = Random.nextInt()
+        override val id: Uuid = Uuid.random()
     ) : LavenderSnackbarEvent {
         override val duration: SnackbarDuration = SnackbarDuration.Indefinite
     }
@@ -33,17 +37,27 @@ object LavenderSnackbarEvents {
     data class MessageEvent(
         override val message: String,
         override val duration: SnackbarDuration,
-        @DrawableRes val iconResId: Int,
-        override val id: Int = Random.nextInt()
+        @DrawableRes val icon: Int,
+        override val id: Uuid = Uuid.random()
     ) : LavenderSnackbarEvent
 
     /** Shows a [SnackBarWithAction] */
     data class ActionEvent(
         override val message: String,
         override val duration: SnackbarDuration = SnackbarDuration.Indefinite,
-        @DrawableRes val iconResId: Int,
-        @DrawableRes val actionIconResId: Int,
+        @DrawableRes val icon: Int,
+        @DrawableRes val actionIcon: Int,
         val action: () -> Unit,
-        override val id: Int = Random.nextInt()
+        override val id: Uuid = Uuid.random()
+    ) : LavenderSnackbarEvent
+
+    /** Shows a [SnackbarWithLoadingIndicatorAndBody] */
+    data class ProgressEvent(
+        override val message: String,
+        val body: MutableState<String>,
+        override val duration: SnackbarDuration = SnackbarDuration.Indefinite,
+        @DrawableRes val icon: Int,
+        val percentage: MutableFloatState,
+        override val id: Uuid = Uuid.random()
     ) : LavenderSnackbarEvent
 }

@@ -1,4 +1,4 @@
-package com.kaii.lavender_snackbars
+package com.kaii.lavender.snackbars
 
 import org.junit.Test
 
