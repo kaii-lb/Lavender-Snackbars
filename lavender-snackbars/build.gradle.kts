@@ -61,7 +61,7 @@ publishing {
 		create<MavenPublication>("release") {
 			groupId = "com.kaii.lavender"
 			artifactId = "snackbars"
-			version = "0.1.8"
+			version = "0.1.9"
 
 			afterEvaluate {
 				from(components["release"])

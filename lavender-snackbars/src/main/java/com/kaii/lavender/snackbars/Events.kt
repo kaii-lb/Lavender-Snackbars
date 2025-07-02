@@ -4,14 +4,12 @@ import androidx.annotation.DrawableRes
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
+import kotlin.random.Random
 
-@OptIn(ExperimentalUuidApi::class)
 interface LavenderSnackbarEvent {
     val message: String
     val duration: SnackbarDuration
-    val id: Uuid
+    val id: Int
 }
 
 interface LavenderSnackbarData {
@@ -21,14 +19,13 @@ interface LavenderSnackbarData {
     fun dismiss() {}
 }
 
-@OptIn(ExperimentalUuidApi::class)
 object LavenderSnackbarEvents {
     /** Shows a [SnackbarWithLoadingIndicator] */
     data class LoadingEvent(
         override val message: String,
         @DrawableRes val icon: Int,
         val isLoading: MutableState<Boolean>,
-        override val id: Uuid = Uuid.random()
+        override val id: Int = Random.nextInt()
     ) : LavenderSnackbarEvent {
         override val duration: SnackbarDuration = SnackbarDuration.Indefinite
     }
@@ -38,7 +35,7 @@ object LavenderSnackbarEvents {
         override val message: String,
         override val duration: SnackbarDuration,
         @DrawableRes val icon: Int,
-        override val id: Uuid = Uuid.random()
+        override val id: Int = Random.nextInt()
     ) : LavenderSnackbarEvent
 
     /** Shows a [SnackBarWithAction] */
@@ -48,7 +45,7 @@ object LavenderSnackbarEvents {
         @DrawableRes val icon: Int,
         @DrawableRes val actionIcon: Int,
         val action: () -> Unit,
-        override val id: Uuid = Uuid.random()
+        override val id: Int = Random.nextInt()
     ) : LavenderSnackbarEvent
 
     /** Shows a [SnackbarWithLoadingIndicatorAndBody] */
@@ -58,6 +55,6 @@ object LavenderSnackbarEvents {
         override val duration: SnackbarDuration = SnackbarDuration.Indefinite,
         @DrawableRes val icon: Int,
         val percentage: MutableFloatState,
-        override val id: Uuid = Uuid.random()
+        override val id: Int = Random.nextInt()
     ) : LavenderSnackbarEvent
 }
