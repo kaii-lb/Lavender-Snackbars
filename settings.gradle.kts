@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Lavender Snackbars"
 // include(":app")
-include(":lavender.snackbars")
+include(":lavender-snackbars")
