@@ -3,6 +3,7 @@ package com.kaii.lavender.snackbars
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
@@ -29,6 +30,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,14 +68,83 @@ object LavenderSnackbarDefaults {
         get() = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.4f)
 
     val bottomEnterTransition =
-        slideInVertically { height -> height } + expandHorizontally { width -> (width * 0.2f).toInt() }
+        slideInVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        ) { height -> height } + expandHorizontally(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        ) { width -> (width * 0.2f).toInt() }
+
     val bottomExitTransition =
-        slideOutVertically { height -> height } + shrinkHorizontally { width -> (width * 0.2f).toInt() }
+        slideOutVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        ) { height -> height } + shrinkHorizontally(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        ) { width -> (width * 0.2f).toInt() }
 
     val topEnterTransition =
-        slideInVertically { height -> -height } + expandHorizontally { width -> (width * 0.2f).toInt() }
+        slideInVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        ) { height -> -height } + expandHorizontally(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        ) { width -> (width * 0.2f).toInt() }
+
     val topExitTransition =
-        slideOutVertically { height -> -height } + shrinkHorizontally { width -> (width * 0.2f).toInt() }
+        slideOutVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        ) { height -> -height } + shrinkHorizontally(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        ) { width -> (width * 0.2f).toInt() }
+
+    val switchAnimation =
+        (scaleIn(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        ) + fadeIn(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessLow
+            )
+        )).togetherWith(
+            scaleOut(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            ) + fadeOut(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            )
+        )
+
+    const val DISMISS_TIMEOUT = 2000L
 
     @Composable
     fun GetSnackbarType(snackbarHostState: LavenderSnackbarHostState) {
@@ -263,7 +334,7 @@ internal fun SnackbarWithLoadingIndicator(
 ) {
     LaunchedEffect(isLoading) {
         if (!isLoading) {
-            delay(2000)
+            delay(LavenderSnackbarDefaults.DISMISS_TIMEOUT)
             dismiss()
         }
     }
@@ -275,18 +346,7 @@ internal fun SnackbarWithLoadingIndicator(
         AnimatedContent(
             targetState = isLoading,
             transitionSpec = {
-                (scaleIn(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy
-                    )
-                ) + fadeIn()
-                        ).togetherWith(
-                        scaleOut(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy
-                            )
-                        ) + fadeOut()
-                    )
+                LavenderSnackbarDefaults.switchAnimation
             },
             label = "Animate between loading and loaded states in snackbar",
             modifier = Modifier
@@ -332,7 +392,7 @@ internal fun SnackbarWithLoadingIndicatorAndBody(
 
     LaunchedEffect(isLoading) {
         if (!isLoading) {
-            delay(2000)
+            delay(LavenderSnackbarDefaults.DISMISS_TIMEOUT)
             dismiss()
         }
     }
@@ -386,18 +446,7 @@ internal fun SnackbarWithLoadingIndicatorAndBody(
             AnimatedContent(
                 targetState = isLoading,
                 transitionSpec = {
-                    (scaleIn(
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy
-                        )
-                    ) + fadeIn()
-                            ).togetherWith(
-                            scaleOut(
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy
-                                )
-                            ) + fadeOut()
-                        )
+                    LavenderSnackbarDefaults.switchAnimation
                 },
                 label = "Animate between loading and loaded states in snackbar",
                 modifier = Modifier
@@ -405,11 +454,16 @@ internal fun SnackbarWithLoadingIndicatorAndBody(
                     .padding(4.dp, 0.dp)
             ) { loading ->
                 if (loading) {
+                    val animated by animateFloatAsState(
+                        targetValue = percentage.floatValue,
+                        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+                    )
+
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.onPrimary,
                         strokeCap = StrokeCap.Round,
                         strokeWidth = 4.dp,
-                        progress = { percentage.floatValue },
+                        progress = { animated },
                         trackColor = LavenderSnackbarDefaults.contentColorLight,
                         modifier = Modifier
                             .size(28.dp)
