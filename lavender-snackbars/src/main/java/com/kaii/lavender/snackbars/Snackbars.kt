@@ -5,12 +5,10 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
@@ -73,12 +71,13 @@ object LavenderSnackbarDefaults {
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessMediumLow
             )
-        ) { height -> height } + expandHorizontally(
+        ) { height -> height } + scaleIn(
             animationSpec = spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessMediumLow
-            )
-        ) { width -> (width * 0.2f).toInt() }
+            ),
+            initialScale = 0.2f
+        )
 
     val bottomExitTransition =
         slideOutVertically(
@@ -86,12 +85,12 @@ object LavenderSnackbarDefaults {
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessMediumLow
             )
-        ) { height -> height } + shrinkHorizontally(
+        ) { height -> height } + scaleOut(
             animationSpec = spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessMediumLow
             )
-        ) { width -> (width * 0.2f).toInt() }
+        )
 
     val topEnterTransition =
         slideInVertically(
@@ -99,12 +98,13 @@ object LavenderSnackbarDefaults {
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessMediumLow
             )
-        ) { height -> -height } + expandHorizontally(
+        ) { height -> -height } + scaleIn(
             animationSpec = spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessMediumLow
-            )
-        ) { width -> (width * 0.2f).toInt() }
+            ),
+            initialScale = 0.2f
+        )
 
     val topExitTransition =
         slideOutVertically(
@@ -112,12 +112,12 @@ object LavenderSnackbarDefaults {
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessMediumLow
             )
-        ) { height -> -height } + shrinkHorizontally(
+        ) { height -> -height } + scaleOut(
             animationSpec = spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessMediumLow
             )
-        ) { width -> (width * 0.2f).toInt() }
+        )
 
     val switchAnimation =
         (scaleIn(
