@@ -23,7 +23,7 @@ object LavenderSnackbarEvents {
     /** Shows a [SnackbarWithLoadingIndicator] */
     data class LoadingEvent(
         override val message: String,
-        @DrawableRes val icon: Int,
+        @param:DrawableRes val icon: Int,
         val isLoading: MutableState<Boolean>,
         override val id: Int = Random.nextInt()
     ) : LavenderSnackbarEvent {
@@ -34,7 +34,7 @@ object LavenderSnackbarEvents {
     data class MessageEvent(
         override val message: String,
         override val duration: SnackbarDuration,
-        @DrawableRes val icon: Int,
+        @param:DrawableRes val icon: Int,
         override val id: Int = Random.nextInt()
     ) : LavenderSnackbarEvent
 
@@ -42,8 +42,8 @@ object LavenderSnackbarEvents {
     data class ActionEvent(
         override val message: String,
         override val duration: SnackbarDuration = SnackbarDuration.Indefinite,
-        @DrawableRes val icon: Int,
-        @DrawableRes val actionIcon: Int,
+        @param:DrawableRes val icon: Int,
+        @param:DrawableRes val actionIcon: Int,
         val action: () -> Unit,
         override val id: Int = Random.nextInt()
     ) : LavenderSnackbarEvent
@@ -53,7 +53,7 @@ object LavenderSnackbarEvents {
         override val message: String,
         val body: MutableState<String>,
         override val duration: SnackbarDuration = SnackbarDuration.Indefinite,
-        @DrawableRes val icon: Int,
+        @param:DrawableRes val icon: Int,
         val percentage: MutableFloatState,
         override val id: Int = Random.nextInt()
     ) : LavenderSnackbarEvent

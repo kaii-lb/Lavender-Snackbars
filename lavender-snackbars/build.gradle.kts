@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -28,8 +30,8 @@ android {
     buildFeatures {
         compose = true
     }
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin.compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
     }
     publishing {
     	singleVariant("release") {
@@ -61,7 +63,7 @@ publishing {
 		create<MavenPublication>("release") {
 			groupId = "com.kaii.lavender"
 			artifactId = "snackbars"
-			version = "0.2.2"
+			version = "0.2.3"
 
 			afterEvaluate {
 				from(components["release"])

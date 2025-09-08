@@ -13,11 +13,14 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.systemBarsIgnoringVisibility
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.overscroll
 import androidx.compose.foundation.rememberOverscrollEffect
@@ -38,7 +41,7 @@ import kotlin.math.roundToInt
 /** Wrapper for easy displaying of [LavenderSnackbarEvent]s.
  * wrap around the top-most component of your UI, usually a NavHost */
 @Suppress("unused")
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun LavenderSnackbarBox(
     snackbarHostState: LavenderSnackbarHostState,
@@ -152,7 +155,7 @@ fun LavenderSnackbarBox(
                 .overscroll(
                     overscrollEffect
                 )
-                .systemBarsPadding()
+                .windowInsetsPadding(WindowInsets.systemBarsIgnoringVisibility)
                 .fillMaxWidth(1f)
                 .wrapContentHeight()
                 .padding(12.dp)
