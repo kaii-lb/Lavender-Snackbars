@@ -43,11 +43,12 @@ sealed interface LavenderSnackbarEvent {
     data class ProgressEvent(
         override val message: String,
         val body: MutableState<String>,
-        override val duration: SnackbarDuration = SnackbarDuration.Indefinite,
         @param:DrawableRes val icon: Int,
         val percentage: MutableFloatState,
         override val id: Int = Random.nextInt()
-    ) : LavenderSnackbarEvent
+    ) : LavenderSnackbarEvent {
+        override val duration: SnackbarDuration = SnackbarDuration.Indefinite
+    }
 }
 
 interface LavenderSnackbarData {
