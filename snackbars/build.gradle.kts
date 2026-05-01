@@ -9,10 +9,10 @@ plugins {
 }
 
 group = "io.github.kaii-lb.lavender"
-version = "0.3.1"
+version = "0.3.2"
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "io.github.kaii_lb.lavender.snackbars"
         compileSdk = 36
         minSdk = 24

@@ -1,12 +1,12 @@
 [versions]
-agp = "9.0.1"
-kotlin = "2.3.20"
+agp = "9.1.1"
+kotlin = "2.3.21"
 coreKtx = "1.18.0"
 appcompat = "1.7.1"
 material = "1.13.0"
-foundation = "1.10.6"
-material3 = "1.5.0-alpha16"
-multiplatform = "1.11.0-alpha04"
+foundation = "1.11.0"
+material3 = "1.5.0-alpha18"
+multiplatform = "1.11.0-beta03"
 napier = "2.7.1"
 
 [libraries]
