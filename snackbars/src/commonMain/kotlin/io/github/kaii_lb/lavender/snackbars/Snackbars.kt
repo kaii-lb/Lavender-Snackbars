@@ -2,7 +2,6 @@ package io.github.kaii_lb.lavender.snackbars
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
@@ -25,7 +24,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -56,10 +55,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.kaii_lb.lavender.snackbars.generated.resources.Res
 import io.github.kaii_lb.lavender.snackbars.generated.resources.checkmark
 import io.github.kaii_lb.lavender.snackbars.generated.resources.close
@@ -241,14 +238,13 @@ private fun LavenderSnackbar(
         shape = CircleShape,
         shadowElevation = 8.dp,
         modifier = Modifier
-            .height(64.dp)
-            .fillMaxWidth(1f)
+            .heightIn(min = 64.dp)
+            .fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(1f)
-                .height(64.dp)
-                .padding(16.dp, 8.dp, 12.dp, 8.dp),
+                .fillMaxWidth()
+                .padding(start = 16.dp, top = 8.dp, end = 12.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -263,7 +259,7 @@ private fun LavenderSnackbar(
 
             Text(
                 text = message,
-                fontSize = TextUnit(16f, TextUnitType.Sp),
+                fontSize = 16.sp,
                 modifier = Modifier
                     .weight(1f)
             )
@@ -355,7 +351,7 @@ internal fun SnackbarWithLoadingIndicator(
             label = "Animate between loading and loaded states in snackbar",
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-                .padding(4.dp, 0.dp)
+                .padding(horizontal = 4.dp)
         ) { loading ->
             if (loading) {
                 CircularProgressIndicator(
@@ -408,14 +404,13 @@ internal fun SnackbarWithLoadingIndicatorAndBody(
         shape = CircleShape,
         shadowElevation = 8.dp,
         modifier = Modifier
-            .height(64.dp)
-            .fillMaxWidth(1f)
+            .heightIn(min = 64.dp)
+            .fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(1f)
-                .height(64.dp)
-                .padding(16.dp, 8.dp, 12.dp, 8.dp),
+                .fillMaxWidth()
+                .padding(start = 16.dp, top = 8.dp, end = 12.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -430,19 +425,20 @@ internal fun SnackbarWithLoadingIndicatorAndBody(
 
             Column(
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
             ) {
                 Text(
                     text = message,
-                    fontSize = TextUnit(16f, TextUnitType.Sp),
-                    fontWeight = FontWeight.Bold
+                    fontSize = 16.sp,
+                    maxLines = 1
                 )
-
-                Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
                     text = body.value,
-                    fontSize = TextUnit(13f, TextUnitType.Sp),
+                    fontSize = 13.sp,
+                    maxLines = 1
                 )
             }
 
@@ -456,7 +452,7 @@ internal fun SnackbarWithLoadingIndicatorAndBody(
                 label = "Animate between loading and loaded states in snackbar",
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .padding(4.dp, 0.dp)
+                    .padding(horizontal = 4.dp)
             ) { loading ->
                 if (loading) {
                     val animated by animateFloatAsState(

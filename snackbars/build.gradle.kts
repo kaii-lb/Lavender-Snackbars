@@ -1,3 +1,6 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -9,12 +12,12 @@ plugins {
 }
 
 group = "io.github.kaii-lb.lavender"
-version = "0.3.2"
+version = "0.3.3"
 
 kotlin {
     android {
         namespace = "io.github.kaii_lb.lavender.snackbars"
-        compileSdk = 36
+        compileSdk = 37
         minSdk = 24
         androidResources.enable = true
 
@@ -27,17 +30,10 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.androidx.core.ktx)
-            implementation(libs.androidx.appcompat)
-            implementation(libs.material)
-            implementation(libs.androidx.foundation)
             implementation(libs.androidx.material3)
-            implementation(libs.androidx.runtime)
-            implementation(libs.androidx.foundation.layout)
             implementation(libs.androidx.ui)
             implementation(libs.androidx.animation)
             implementation(libs.androidx.ui.tooling.preview)
-            implementation(libs.androidx.ui.tooling)
             implementation(libs.compose.components.resources)
             implementation(libs.aakira.napier)
         }

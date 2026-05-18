@@ -114,7 +114,7 @@ fun LavenderSnackbarBox(
                 anchoredDraggableState.snapTo(anchoredDraggableState.currentValue.getLastPosition())
             }
 
-            if (currentEvent?.event is LavenderSnackbarEvent.LoadingEvent) {
+            if (currentEvent?.event is LavenderSnackbarEvent.LoadingEvent || currentEvent?.event is LavenderSnackbarEvent.ProgressEvent) {
                 anchoredDraggableState.updateAnchors(
                     newAnchors = loadingAnchors
                 )
@@ -152,9 +152,7 @@ fun LavenderSnackbarBox(
                     flingBehavior = anchoredDraggableFlingBehavior,
                     overscrollEffect = overscrollEffect
                 )
-                .overscroll(
-                    overscrollEffect
-                )
+                .overscroll(overscrollEffect)
                 .windowInsetsPadding(WindowInsets.systemBarsIgnoringVisibility)
                 .fillMaxWidth(1f)
                 .wrapContentHeight()

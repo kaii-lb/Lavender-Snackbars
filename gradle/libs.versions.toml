@@ -1,26 +1,16 @@
 [versions]
 agp = "9.1.1"
 kotlin = "2.3.21"
-coreKtx = "1.18.0"
-appcompat = "1.7.1"
-material = "1.13.0"
-foundation = "1.11.0"
-material3 = "1.5.0-alpha18"
-multiplatform = "1.11.0-beta03"
+foundation = "1.11.1"
+material3 = "1.5.0-alpha19"
+multiplatform = "1.11.0"
 napier = "2.7.1"
 
 [libraries]
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
-androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "foundation" }
-androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundation" }
 androidx-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "foundation" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "foundation" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "foundation" }
-androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "foundation" }
 compose-components-resources = { group = "org.jetbrains.compose.components", name = "components-resources", version.ref = "multiplatform" }
 aakira-napier = { group = "io.github.aakira", name = "napier", version.ref = "napier" }
 

@@ -29,6 +29,11 @@ class LavenderSnackbarHostState {
             suspendCancellableCoroutine { continuation ->
                 continuation.invokeOnCancellation {
                     Napier.d("Snackbar cancelled: $event", null, TAG)
+
+                    if (currentSnackbarEvent?.event?.id == event.id) {
+                        currentSnackbarEvent!!.dismiss()
+                    }
+
                     currentSnackbarEvent = null
                 }
 
@@ -39,6 +44,11 @@ class LavenderSnackbarHostState {
             }
         } finally {
             Napier.d("Snackbar finished: $event", null, TAG)
+
+            if (currentSnackbarEvent?.event?.id == event.id) {
+                currentSnackbarEvent!!.dismiss()
+            }
+
             currentSnackbarEvent = null
         }
 
@@ -103,10 +113,30 @@ fun LavenderSnackbarHost(snackbarHostState: LavenderSnackbarHostState) {
 
     val currentEvent = snackbarHostState.currentSnackbarEvent
     LaunchedEffect(currentEvent) {
-        if (currentEvent != null && currentEvent.event.duration != SnackbarDuration.Indefinite) {
-            val delay = currentEvent.event.duration.toMillis()
-            delay(delay)
-            currentEvent.dismiss()
+        if (currentEvent != null) {
+            when (val event = currentEvent.event) {
+                is LavenderSnackbarEvent.LoadingEvent -> {
+                    if (!event.isLoading.value) {
+                        delay(3000)
+                        currentEvent.dismiss()
+                    }
+                }
+
+                is LavenderSnackbarEvent.ProgressEvent -> {
+                    if (event.percentage.floatValue >= 1f) {
+                        delay(3000)
+                        currentEvent.dismiss()
+                    }
+                }
+
+                else -> {
+                    if (event.duration != SnackbarDuration.Indefinite) {
+                        val delay = currentEvent.event.duration.toMillis()
+                        delay(delay)
+                        currentEvent.dismiss()
+                    }
+                }
+            }
         }
     }
 }
